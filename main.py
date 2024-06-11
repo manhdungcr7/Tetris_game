@@ -1,4 +1,4 @@
-import pygame
+import pygame, asyncio
 import sys
 from game import Game
 from colors import Colors
@@ -42,104 +42,108 @@ GAME_UPDATE = pygame.USEREVENT
 game_speed = 200
 pygame.time.set_timer(GAME_UPDATE, game_speed)
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game.save_state()
-            game.save_highscore()
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if not game.running:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-            else:
-                if game.game_over:
-                    if event.key == pygame.K_RETURN:
-                        game.reset()
-                    elif event.key == pygame.K_ESCAPE:
+async def main():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.save_state()
+                game.save_highscore()
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if not game.running:
+                    if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         sys.exit()
                 else:
-                    if event.key == pygame.K_LEFT:
-                        game.move_left()
-                    if event.key == pygame.K_RIGHT:
-                        game.move_right()
-                    if event.key == pygame.K_DOWN:
-                        game.move_down()
-                        game.update_score(0, 1)
-                    if event.key == pygame.K_UP:
-                        game.rotate()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if game.paused:
-                game.handle_pause_event(event)
-            else:
-                if game.pause_rect.collidepoint(event.pos):
-                    game.handle_pause()
-                elif not game.running:
-                    if game.showing_tutorial:
-                        if game.back_rect.collidepoint(event.pos):
-                            game.showing_tutorial = False
-                    else:
-                        if game.continue_rect.collidepoint(event.pos):
-                            game.load_state()
-                            game.running = True
-                        elif game.start_rect.collidepoint(event.pos):
+                    if game.game_over:
+                        if event.key == pygame.K_RETURN:
                             game.reset()
-                            game.running = True
-                        elif game.tutorial_rect.collidepoint(event.pos):
-                            game.showing_tutorial = True
+                        elif event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+                            sys.exit()
+                    else:
+                        if event.key == pygame.K_LEFT:
+                            game.move_left()
+                        if event.key == pygame.K_RIGHT:
+                            game.move_right()
+                        if event.key == pygame.K_DOWN:
+                            game.move_down()
+                            game.update_score(0, 1)
+                        if event.key == pygame.K_UP:
+                            game.rotate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if game.paused:
+                    game.handle_pause_event(event)
+                else:
+                    if game.pause_rect.collidepoint(event.pos):
+                        game.handle_pause()
+                    elif not game.running:
+                        if game.showing_tutorial:
+                            if game.back_rect.collidepoint(event.pos):
+                                game.showing_tutorial = False
+                        else:
+                            if game.continue_rect.collidepoint(event.pos):
+                                game.load_state()
+                                game.running = True
+                            elif game.start_rect.collidepoint(event.pos):
+                                game.reset()
+                                game.running = True
+                            elif game.tutorial_rect.collidepoint(event.pos):
+                                game.showing_tutorial = True
+                            elif game.exit_rect.collidepoint(event.pos):
+                                pygame.quit()
+                                sys.exit()
+                    elif game.game_over:
+                        if game.retry_rect.collidepoint(event.pos):
+                            game.reset()
                         elif game.exit_rect.collidepoint(event.pos):
                             pygame.quit()
                             sys.exit()
-                elif game.game_over:
-                    if game.retry_rect.collidepoint(event.pos):
-                        game.reset()
-                    elif game.exit_rect.collidepoint(event.pos):
-                        pygame.quit()
-                        sys.exit()
-
-        if game.running and not game.game_over and not game.paused:
-            if event.type == GAME_UPDATE:
-                game.move_down()
-
-    # Drawing
-    if game.paused:
-        screen.fill(Colors.dark_blue)
-        game.draw_pause_menu(screen)
-    else:
-        score_value_surface = title_font.render(str(game.score), True, Colors.white)
-        highscore_value_surface = title_font.render(str(game.highscore), True, Colors.white)
-
-        if game.running:
-            if game.game_over:
-                screen.blit(scaled_image_over, (-80, 0))
-                game.draw_game_over_menu(screen)
-            else:
-                screen.fill(Colors.dark_blue)
-                screen.blit(score_surface, (365, 22))
-                screen.blit(highscore_surface, (335, 132))
-                screen.blit(next_surface, (375, 252))
-
-                pygame.draw.rect(screen, Colors.light_blue, score_rect, 0, 10)
-                screen.blit(score_value_surface, score_value_surface.get_rect(centerx=score_rect.centerx, centery=score_rect.centery))
-                pygame.draw.rect(screen, Colors.light_blue, highscore_rect, 0, 10)
-                screen.blit(highscore_value_surface, highscore_value_surface.get_rect(centerx=highscore_rect.centerx, centery=highscore_rect.centery))
-                pygame.draw.rect(screen, Colors.light_blue, next_rect, 0, 10)
-                game.draw(screen, image_pause)
-
-                # Check if score has reached 1000 and double the speed
-                if game.score >= 300 and game_speed == 300:
-                    game_speed = 150
-                    pygame.time.set_timer(GAME_UPDATE, game_speed)
+    
+            if game.running and not game.game_over and not game.paused:
+                if event.type == GAME_UPDATE:
+                    game.move_down()
+    
+        # Drawing
+        if game.paused:
+            screen.fill(Colors.dark_blue)
+            game.draw_pause_menu(screen)
         else:
-            screen.blit(scaled_image, (0, -20))
-
-            if game.showing_tutorial:
-                game.draw_tutorial(screen)
+            score_value_surface = title_font.render(str(game.score), True, Colors.white)
+            highscore_value_surface = title_font.render(str(game.highscore), True, Colors.white)
+    
+            if game.running:
+                if game.game_over:
+                    screen.blit(scaled_image_over, (-80, 0))
+                    game.draw_game_over_menu(screen)
+                else:
+                    screen.fill(Colors.dark_blue)
+                    screen.blit(score_surface, (365, 22))
+                    screen.blit(highscore_surface, (335, 132))
+                    screen.blit(next_surface, (375, 252))
+    
+                    pygame.draw.rect(screen, Colors.light_blue, score_rect, 0, 10)
+                    screen.blit(score_value_surface, score_value_surface.get_rect(centerx=score_rect.centerx, centery=score_rect.centery))
+                    pygame.draw.rect(screen, Colors.light_blue, highscore_rect, 0, 10)
+                    screen.blit(highscore_value_surface, highscore_value_surface.get_rect(centerx=highscore_rect.centerx, centery=highscore_rect.centery))
+                    pygame.draw.rect(screen, Colors.light_blue, next_rect, 0, 10)
+                    game.draw(screen, image_pause)
+    
+                    # Check if score has reached 1000 and double the speed
+                    if game.score >= 300 and game_speed == 300:
+                        game_speed = 150
+                        pygame.time.set_timer(GAME_UPDATE, game_speed)
             else:
-                game.draw_menu(screen)
+                screen.blit(scaled_image, (0, -20))
+    
+                if game.showing_tutorial:
+                    game.draw_tutorial(screen)
+                else:
+                    game.draw_menu(screen)
+    
+        pygame.display.update()
+        clock.tick(60)
+        await asyncio.sleep(0)
 
-    pygame.display.update()
-    clock.tick(60)
+asyncio.run(main())
