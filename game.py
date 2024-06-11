@@ -19,20 +19,20 @@ class Game:
         self.game_over = False
         self.score = 0
         self.highscore = self.load_highscore()
-        self.rotate_sound = pygame.mixer.Sound("/home/dao/đồ án OOP/Sounds/rotate.ogg")
-        self.clear_sound = pygame.mixer.Sound("/home/dao/đồ án OOP/Sounds/clear.ogg")
+        self.rotate_sound = pygame.mixer.Sound("Sounds/rotate.ogg")
+        self.clear_sound = pygame.mixer.Sound("Sounds/clear.ogg")
 
-        pygame.mixer.music.load("/home/dao/đồ án OOP/Sounds/music.ogg")
+        pygame.mixer.music.load("Sounds/music.ogg")
         pygame.mixer.music.play(-1)
 
-        self.image_menu = pygame.image.load("/home/dao/đồ án OOP/Images/menu.png")
+        self.image_menu = pygame.image.load("Images/menu.png")
         new_width = 240
         new_height = 100
         self.image_menu = pygame.transform.scale(self.image_menu, (new_width, new_height))
 
 
 
-        self.menu_font = pygame.font.Font("/home/dao/đồ án OOP/Bond Story.ttf", 25)
+        self.menu_font = pygame.font.Font("Bond Story.ttf", 25)
         self.start_surface = self.menu_font.render("Start", True, Colors.yellow)
         self.continue_surface = self.menu_font.render("Continue", True, Colors.yellow)
         self.exit_surface = self.menu_font.render("Exit", True, Colors.yellow)

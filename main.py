@@ -5,7 +5,7 @@ from colors import Colors
 
 pygame.init()
 
-title_font = pygame.font.Font("/home/dao/đồ án OOP/Bond Story.ttf", 35)
+title_font = pygame.font.Font("Bond Story.ttf", 35)
 score_surface = title_font.render("Score", True, Colors.green)
 highscore_surface = title_font.render("Highscore", True, Colors.green)
 next_surface = title_font.render("Next", True, Colors.green)
@@ -15,17 +15,17 @@ highscore_rect = pygame.Rect(320, 170, 170, 60)
 next_rect = pygame.Rect(320, 290, 170, 180)
 
 
-image_over = pygame.image.load("/home/dao/đồ án OOP/Images/gameover1.jpg")
+image_over = pygame.image.load("Images/gameover1.jpg")
 new_width = 630
 new_height = 620
 scaled_image_over = pygame.transform.scale(image_over, (new_width, new_height))
-image_tetris = pygame.image.load("/home/dao/đồ án OOP/Images/tetris1.png")
+image_tetris = pygame.image.load("Images/tetris1.png")
 new_width = 500
 new_height = 640
 scaled_image = pygame.transform.scale(image_tetris, (new_width, new_height))
 
 
-image_pause = pygame.image.load("/home/dao/đồ án OOP/Images/pause.png")
+image_pause = pygame.image.load("Images/pause.png")
 new_width = 60
 new_height = 60
 image_pause = pygame.transform.scale(image_pause, (new_width, new_height))
@@ -39,7 +39,7 @@ clock = pygame.time.Clock()
 game = Game()
 
 GAME_UPDATE = pygame.USEREVENT
-game_speed = 20
+game_speed = 200
 pygame.time.set_timer(GAME_UPDATE, game_speed)
 
 while True:
